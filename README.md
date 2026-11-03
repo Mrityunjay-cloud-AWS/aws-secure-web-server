@@ -1,246 +1,144 @@
-\# CloudLab — Secure AWS Web Server
+# CloudLab - Secure AWS Web Server
 
+## About the Project
 
+CloudLab is a hands-on AWS project I built to understand how websites are hosted on AWS and how different AWS services work together.
 
-\## Project Overview
+I started by launching an EC2 instance with Amazon Linux 2023 and installing Apache to host a website. After getting the website running, I created a private S3 bucket to store a configuration file and used an IAM role to allow the EC2 instance to access it securely.
 
+I also used Git and GitHub to manage the project files and created a Bash script to make website deployment easier.
 
+Through this project, I got practical experience with Linux, AWS networking, IAM, S3, and basic deployment automation.
 
-CloudLab is a beginner cloud engineering project that demonstrates how to deploy a website on Amazon EC2, serve it using Apache, and securely retrieve a private configuration file from Amazon S3 using an IAM role.
-
-
-
-The project combines Linux administration, networking, Git version control, AWS identity and access management, and basic deployment automation.
-
-
-
-\## Architecture
-
-
-
-```text
+## Architecture
 
 Developer Laptop
-
-&#x20;     |
-
-&#x20;     | Git push
-
-&#x20;     v
-
+|
+| Git Push
+v
 GitHub Repository
+|
+| Git Pull
+v
+EC2 Instance (Amazon Linux 2023)
+|
++---- Apache HTTP Server
+|          |
+|          v
+|      Website Visitors
+|
++---- IAM Role
+|
+v
+IAM Policy
+|
+v
+Private S3 Bucket
+config.json
 
-&#x20;     |
+## AWS Services Used
 
-&#x20;     | Git pull
+### 1. Amazon EC2
 
-&#x20;     v
+I launched an EC2 instance using Amazon Linux 2023 and installed Apache to host my website.
 
-Amazon EC2 — Amazon Linux 2023
+### 2. Amazon VPC and Security Groups
 
-&#x20;     |
+I used Security Groups to control access to the EC2 instance. SSH access was restricted to my public IP, while HTTP access was allowed so visitors could open the website.
 
-&#x20;     +---- Apache HTTP Server
+### 3. AWS IAM
 
-&#x20;     |          |
+I created an IAM role and attached it to my EC2 instance. Instead of storing AWS access keys on the server, I used the role to provide temporary credentials.
 
-&#x20;     |          v
+I also created a custom IAM policy that allows the instance to read a specific configuration file from S3.
 
-&#x20;     |      Website Visitors
+### 4. Amazon S3
 
-&#x20;     |
+I created a private S3 bucket and uploaded a config.json file. Public access was blocked, and the EC2 instance accessed the file through its IAM role.
 
-&#x20;     +---- IAM Role
+### 5. AWS CLI
 
-&#x20;                |
+I used the AWS CLI from the EC2 terminal to check the active AWS identity and download the configuration file from S3.
 
-&#x20;                v
+## Tools and Technologies
 
-&#x20;          IAM Permissions
+* Amazon EC2
+* Amazon S3
+* AWS IAM
+* Amazon VPC
+* Amazon Linux 2023
+* Apache HTTP Server
+* AWS CLI
+* Linux and Bash scripting
+* Git and GitHub
+* HTML and CSS
 
-&#x20;                |
+## Security Configurations
 
-&#x20;                v
+Security was one of the main things I focused on while building this project.
 
-&#x20;          Private Amazon S3
+The following configurations were implemented:
 
-&#x20;            config.json
+* Restricted SSH access to my public IP address.
+* Allowed HTTP traffic for public website access.
+* Kept the S3 bucket private with Block Public Access enabled.
+* Used an IAM role instead of storing permanent AWS access keys on EC2.
+* Created a custom IAM policy with access limited to a specific S3 object.
+* Added private key and environment files to .gitignore to avoid accidentally committing sensitive files.
 
-```
+## Website Deployment
 
+I stored the website code in GitHub and cloned the repository onto my EC2 instance.
 
+The website files were copied to Apache's document root at /var/www/html/.
 
-\## AWS Services Used
+I also created a Bash script called deploy.sh to simplify the deployment process.
 
+The script performs the following tasks:
 
+1. Pulls the latest code from the GitHub main branch.
+2. Copies the updated HTML file to Apache's document root.
+3. Checks the Apache configuration.
+4. Reloads the Apache service.
+5. Checks whether the website is responding locally.
 
-\### Amazon EC2
+This gave me practical experience with automating repetitive deployment tasks using shell scripting.
 
+## What I Learned
 
+While working on this project, I got hands-on experience with:
 
-Hosts the website on an Amazon Linux 2023 instance.
+* Creating and configuring an EC2 instance.
+* Connecting to Linux servers using SSH.
+* Working with Linux commands and file permissions.
+* Installing and managing Apache.
+* Configuring Security Groups and inbound rules.
+* Managing code using Git and GitHub.
+* Creating IAM roles and custom permission policies.
+* Understanding how EC2 uses IAM roles to access AWS services.
+* Creating private S3 buckets and managing objects.
+* Using AWS CLI to interact with AWS services.
+* Writing Bash scripts for basic deployment automation.
 
+## Limitations and Future Improvements
 
-
-\### Amazon VPC and Security Groups
-
-
-
-Control network access to the instance. SSH access is restricted to the administrator's IP address, while HTTP is publicly accessible for the demonstration website.
-
-
-
-\### AWS IAM
-
-
-
-An EC2 IAM role provides temporary AWS credentials without requiring permanent access keys to be stored on the instance.
-
-
-
-The custom IAM permissions policy grants `s3:GetObject` access to the designated configuration object.
-
-
-
-\### Amazon S3
-
-
-
-Stores the application's configuration file in a private bucket with Block Public Access enabled.
-
-
-
-\### AWS CLI
-
-
-
-Tests the EC2 instance's AWS identity and retrieves the private configuration object.
-
-
-
-\## Tools and Technologies
-
-
-
-\* Amazon Linux 2023
-
-\* Amazon EC2
-
-\* Amazon S3
-
-\* AWS IAM
-
-\* AWS CLI
-
-\* Apache HTTP Server
-
-\* Linux shell scripting
-
-\* Git and GitHub
-
-\* HTML and CSS
-
-
-
-\## Security Practices
-
-
-
-\* Restrict SSH access to the administrator's public IP address.
-
-\* Allow public HTTP access only as required for the demonstration.
-
-\* Keep the S3 bucket private.
-
-\* Use an EC2 IAM role instead of permanent AWS access keys.
-
-\* Apply least-privilege permissions to S3 access.
-
-\* Avoid committing private keys, credentials, and environment files to Git.
-
-\* Review AWS resources and costs after testing.
-
-
-
-\## Deployment
-
-
-
-The website is stored in the GitHub repository and deployed to Apache's document root at `/var/www/html/`.
-
-
-
-The `deploy.sh` script pulls updates from the `main` branch, installs the website's HTML file, validates Apache's configuration, reloads Apache, and checks the local HTTP response.
-
-
-
-\## Project Learning Outcomes
-
-
-
-\* Launch and connect to an EC2 instance using SSH.
-
-\* Configure Security Group inbound rules.
-
-\* Install and manage Apache on Linux.
-
-\* Use Git and GitHub for version control.
-
-\* Create and attach IAM roles and policies.
-
-\* Access a private S3 object using an EC2 IAM role.
-
-\* Use AWS CLI commands for identity and S3 operations.
-
-\* Automate a basic website deployment using Bash.
-
-\* Apply foundational cloud security practices.
-
-
-
-\## Limitations and Future Improvements
-
-
-
-This is a learning project, not a production-hardened architecture.
-
-
+This is a learning project, so the setup is intentionally simple. There are several things I would like to improve as I continue learning AWS.
 
 Possible improvements include:
 
+* Configure HTTPS instead of serving the website only over HTTP.
+* Use an Application Load Balancer to distribute incoming traffic.
+* Add an Auto Scaling Group for better availability and scalability.
+* Set up CloudWatch metrics and alarms.
+* Create a CI/CD pipeline for automated deployment.
+* Add deployment rollback and automated testing.
 
+## Cost Management
 
-\* Configure HTTPS with a suitable certificate.
+I used AWS resources for learning and testing, so I also reviewed the resources that could generate charges.
 
-\* Use an Application Load Balancer and Auto Scaling for a more resilient architecture.
+When the project is not being used, I plan to stop or remove resources that are no longer needed and check AWS Billing to monitor costs.
 
-\* Add monitoring and alarms with Amazon CloudWatch.
+## Author
 
-\* Introduce a CI/CD pipeline.
-
-\* Add automated tests and deployment rollback.
-
-\* Review and tighten IAM permissions as requirements evolve.
-
-
-
-\## Cost Management
-
-
-
-AWS resources may incur charges depending on their configuration and usage.
-
-
-
-Review running instances, attached storage, public IPv4 addresses, and other billable resources when the project is not in use.
-
-
-
-\## Author
-
-
-
-Cloud engineering learning project.
-
-
-
+Built as part of my hands-on learning journey in AWS and Cloud Engineering.
